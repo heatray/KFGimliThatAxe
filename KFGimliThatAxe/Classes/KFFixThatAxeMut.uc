@@ -20,40 +20,39 @@ simulated function Timer()
 {
 	// Log("Fix That Axe: Retry " $ retryCount);
 
-	foreach DynamicActors(class'ROBufferedTCPLink', Link)
-	{
-		// Check JSON Errors
-		if (InStr(Link.InputBuffer, "\"success\":false") != -1)
-		{
-			Destroy();
-			Log("Fix That Axe: JSON Error");
-			return;
-		}
-		if (InStr(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\",\"achieved\":0") != -1)
-		{
-			Destroy();
-			Log("Fix That Axe: Not A Warhammer isn't achieved");
-			return;
-		}
-
-		// Transform JSON
-		if (InStr(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\",\"achieved\":1") != -1)
-		{
-			Link.InputBuffer = Repl(Link.InputBuffer, "\"success\":true", "\"success\": true");
-			Link.InputBuffer = Repl(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\"", "\"apiname\": \"NotAWarhammer\"");
-			Link.InputBuffer = Repl(Link.InputBuffer, "\"achieved\":1", "\"achieved\": 1");
-			Link.InputBuffer = Link.InputBuffer $ Link.CRLF;
-			// Log("Fix That Axe: JSON Transformed");
-		}
-	}
-
 	foreach DynamicActors(class'KFSteamWebApi', Api)
 	{
-		// Check JSON
-		if (InStr(Api.playerStats, "\"success\": true") != -1)
+		Link = Api.myLink;
+		if (Link != None)
+		{
+			// Check JSON Errors
+			if (InStr(Link.InputBuffer, "\"success\":false") != -1)
+			{
+				Destroy();
+				Log("Fix That Axe: JSON Error");
+				return;
+			}
+			if (InStr(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\",\"achieved\":0") != -1)
+			{
+				Destroy();
+				Log("Fix That Axe: Not A Warhammer isn't achieved");
+				return;
+			}
+
+			// Transform JSON
+			if (InStr(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\",\"achieved\":1") != -1)
+			{
+				Link.InputBuffer = Repl(Link.InputBuffer, "\"success\":true", "\"success\": true");
+				Link.InputBuffer = Repl(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\"", "\"apiname\": \"NotAWarhammer\"");
+				Link.InputBuffer = Repl(Link.InputBuffer, "\"achieved\":1", "\"achieved\": 1");
+				Link.InputBuffer = Link.InputBuffer $ Link.CRLF;
+				// Log("Fix That Axe: JSON Transformed");
+			}
+		}
+		else
 		{
 			Destroy();
-			Log("Fix That Axe: JSON Success");
+			Log("Fix That Axe: Success");
 			return;
 		}
 	}
