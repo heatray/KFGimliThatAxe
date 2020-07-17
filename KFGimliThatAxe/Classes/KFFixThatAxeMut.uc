@@ -6,35 +6,44 @@
 
 class KFFixThatAxeMut extends Mutator;
 
-var KFSteamWebApi Api;
-var ROBufferedTCPLink Link;
 var int retryCount;
 
-simulated function ModifyPlayer(Pawn Other)
+simulated function PostBeginPlay()
 {
+	Log("Fix That Axe: Init");
 	retryCount = 0;
-	SetTimer(1, false);
+	SetTimer(0.1, false);
 }
 
 simulated function Timer()
 {
-	// Log("Fix That Axe: Retry " $ retryCount);
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		FixWebAPI();
+	}
+}
+
+simulated function FixWebAPI()
+{
+	local KFSteamWebApi Api;
+	local ROBufferedTCPLink Link;
 
 	foreach DynamicActors(class'KFSteamWebApi', Api)
 	{
+		retryCount++;
+		// Log("Fix That Axe: FixWebAPI Retry " $ retryCount);
+
 		Link = Api.myLink;
-		if (Link != None)
+		if (Link != none)
 		{
 			// Check JSON Errors
 			if (InStr(Link.InputBuffer, "\"success\":false") != -1)
 			{
-				Destroy();
 				Log("Fix That Axe: JSON Error");
 				return;
 			}
 			if (InStr(Link.InputBuffer, "\"apiname\":\"NotAWarhammer\",\"achieved\":0") != -1)
 			{
-				Destroy();
 				Log("Fix That Axe: Not A Warhammer isn't achieved");
 				return;
 			}
@@ -51,23 +60,19 @@ simulated function Timer()
 		}
 		else
 		{
-			Destroy();
 			Log("Fix That Axe: Success");
 			return;
 		}
 	}
 
 	// 5 sec Repeat
-	if (retryCount++ >= 24)
+	if (retryCount >= 24)
 	{
-		Destroy();
 		Log("Fix That Axe: Retries Limit");
-		return;
 	}
 	else
 	{
-		SetTimer(5, true);
-		return;
+		SetTimer(5, false);
 	}
 }
 
@@ -75,7 +80,7 @@ DefaultProperties
 {
 	GroupName="KF-Achievements"
 	FriendlyName="Fix That Axe"
-	Description="Fix Gimli That Axe! Achievement; by Heatray"
+	Description="Repair \"Gimli That Axe!\" Achievement; by Heatray"
 
 	RemoteRole=ROLE_SimulatedProxy
 	bAlwaysRelevant=true
