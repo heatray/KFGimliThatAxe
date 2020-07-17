@@ -4,7 +4,7 @@
 // https://s.team/p/kff-tvmg
 //===============================================
 
-class KFFixThatAxeMut extends Mutator;
+class KFGimliMut extends Mutator;
 
 var int retryCount;
 
