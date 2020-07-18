@@ -80,7 +80,7 @@ DefaultProperties
 {
 	GroupName="KF-Achievements"
 	FriendlyName="Fix That Axe"
-	Description="Repair \"Gimli That Axe!\" Achievement; by Heatray"
+	Description="Repair Gimli That Axe! Achievement; by Heatray"
 
 	RemoteRole=ROLE_SimulatedProxy
 	bAlwaysRelevant=true
